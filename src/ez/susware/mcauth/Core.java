@@ -41,9 +41,9 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 		String path = "players." + p.getName().toLowerCase();
 		unverified.add(p.getName());
 		if(!config.contains(path)) {
-			p.sendMessage("§cRegister yourself with §7/reg (password) (password again)");
+			p.sendMessage("Â§cRegister yourself with Â§7/reg (password) (password again)");
 		} else {
-			p.sendMessage("§cVerify yourself with §7/login (password)");
+			p.sendMessage("Â§cVerify yourself with Â§7/login (password)");
 		}
 	}
 	
@@ -89,20 +89,21 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 			if(sender instanceof Player) {
 				Player p = (Player) sender;
 				if(!unverified.contains(p.getName())) {
-					p.sendMessage("§cYou've already logged in");
+					p.sendMessage("Â§cYou've already logged in");
 					return true;
 				} else {
 					if(args.length != 1) {
-						p.sendMessage("§cUsage: /login (password)");
+						p.sendMessage("Â§cUsage: /login (password)");
 						return true;
 					} else {
 						String pw = config.getString("players." + p.getName().toLowerCase());
 						if(args[0].equals(pw)) {
-							p.sendMessage("§aSuccessfully logged in");
+							p.sendMessage("Â§aSuccessfully logged in");
 							unverified.remove(p.getName());
 							return true;
 						} else {
-							p.kickPlayer("§cWrong password!");
+							unverified.remove(p.getName());
+							p.kickPlayer("Â§cWrong password!");
 							return true;
 						}
 					}
@@ -117,24 +118,24 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 				Player p = (Player) sender;
 				String path = "players." + p.getName().toLowerCase();
 				if(config.contains(path)) {
-					p.sendMessage("§cYou've already registered");
+					p.sendMessage("Â§cYou've already registered");
 					return true;
 				} else {
 					if(!unverified.contains(p.getName())) {
-						p.sendMessage("§cYou've already logged in");
+						p.sendMessage("Â§cYou've already logged in");
 						return true;
 					} else {
 						if(args.length != 2) {
-							p.sendMessage("§cUsage: /reg (password) (password again)");
+							p.sendMessage("Â§cUsage: /reg (password) (password again)");
 							return true;
 						} else {
 							if(args[0].equals(args[1])) {
-								p.sendMessage("§aSuccessfully registered!");
+								p.sendMessage("Â§aSuccessfully registered!");
 								config.set(path, args[0]);
 								unverified.remove(p.getName());
 								return true;
 							} else {
-								p.sendMessage("§cPasswords does not match");
+								p.sendMessage("Â§cPasswords does not match");
 								return true;
 							}
 						}
@@ -147,23 +148,46 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 		}
 		if(cmd.getName().equalsIgnoreCase("resetacc")) {
 			if(sender instanceof Player) {
-				sender.sendMessage("§cThis command is not for players");
+				sender.sendMessage("Â§cThis command is not for players");
 				return true;
 			} else {
 				if(args.length == 1) {
 					String path = "players." + args[0].toLowerCase();
 					if(config.contains(path)) {
 						config.set(path, null);
-						sender.sendMessage("§aSuccessfully removed §7 " + args[0] + "§a's account");
+						sender.sendMessage("Â§aSuccessfully removed Â§7 " + args[0] + "Â§a's account");
 						return true;
 					} else {
-						sender.sendMessage("§cThis player is not in the database");
+						sender.sendMessage("Â§cThis player is not in the database");
 						return true;
 					}
 				} else {
-					sender.sendMessage("§cUsage: /resetacc (player)");
+					sender.sendMessage("Â§cUsage: /resetacc (player)");
 					return true;
 				}
+			}
+		}
+		if(cmd.getName().equalsIgnoreCase("changepass")) {
+			if(sender instanceof Player) {
+				Player p = (Player) sender;
+				if(args.length != 2) {
+					p.sendMessage("Â§cUsage: /changepass (old password) (new password)");
+					return true;
+				} else {
+					String pw = config.getString("players." + p.getName().toLowerCase());
+					String path = "players." + p.getName().toLowerCase();
+					if(args[0].equals(pw)) {
+						config.set(path, args[1]);
+						p.sendMessage("Â§aYour password successfully changed");
+						return true;
+					} else {
+						p.sendMessage("Â§cYour old password does not match");
+						return true;
+					}
+				}
+			} else {
+				sender.sendMessage("Â§c/resetacc jobb, hidd el");
+				return true;
 			}
 		}
 		return false;
