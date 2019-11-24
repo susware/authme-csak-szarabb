@@ -102,8 +102,7 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 							unverified.remove(p.getName());
 							return true;
 						} else {
-							unverified.remove(p.getName());
-							p.kickPlayer("§cWrong password!");
+							p.sendMessage("§cWrong password!");
 							return true;
 						}
 					}
