@@ -18,7 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Core extends JavaPlugin implements Listener, CommandExecutor {
 
-	public static ArrayList<String> unverified = new ArrayList<String>();
+	public static ArrayList<Player> unverified = new ArrayList<Player>();
 	
 	public void onEnable() {
 		this.getConfig().addDefault("players", 0);
@@ -39,7 +39,7 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		String path = "players." + p.getName().toLowerCase();
-		unverified.add(p.getName());
+		unverified.add(p);
 		if(!config.contains(path)) {
 			p.sendMessage("§cRegister yourself with §7/reg (password) (password again)");
 		} else {
@@ -50,31 +50,29 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 	@EventHandler 
 	public void onMove(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
-		if(unverified.contains(p.getName())) {
+		if(unverified.contains(p)) {
 			p.teleport(e.getFrom());
 			e.setCancelled(true);
-		}else {
-			return;
 		}
  	}
 	
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
-		if(e.getEntity() instanceof Player && unverified.contains(e.getEntity().getName())) {
+		if(e.getEntity() instanceof Player && unverified.contains(e.getEntity())) {
 			e.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent e) {
-		if(unverified.contains(e.getPlayer().getName())) {
+		if(unverified.contains(e.getPlayer())) {
 			e.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onCmd(PlayerCommandPreprocessEvent e) {
-		if(unverified.contains(e.getPlayer().getName())) {
+		if(unverified.contains(e.getPlayer())) {
 			if(e.getMessage().startsWith("/login") || e.getMessage().startsWith("/l") || e.getMessage().startsWith("/register") || e.getMessage().startsWith("/reg")) {
 				e.setCancelled(false);
 			} else {
@@ -88,7 +86,7 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 		if(cmd.getName().equalsIgnoreCase("login")) {
 			if(sender instanceof Player) {
 				Player p = (Player) sender;
-				if(!unverified.contains(p.getName())) {
+				if(!unverified.contains(p)) {
 					p.sendMessage("§cYou've already logged in");
 					return true;
 				} else {
@@ -99,8 +97,7 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 						String pw = config.getString("players." + p.getName().toLowerCase());
 						if(args[0].equals(pw)) {
 							p.sendMessage("§aSuccessfully logged in");
-							unverified.remove(p.getName());
-							return true;
+							unverified.remove(p);
 						} else {
 							p.sendMessage("§cWrong password!");
 							return true;
@@ -120,7 +117,7 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 					p.sendMessage("§cYou've already registered");
 					return true;
 				} else {
-					if(!unverified.contains(p.getName())) {
+					if(!unverified.contains(p)) {
 						p.sendMessage("§cYou've already logged in");
 						return true;
 					} else {
@@ -131,8 +128,7 @@ public class Core extends JavaPlugin implements Listener, CommandExecutor {
 							if(args[0].equals(args[1])) {
 								p.sendMessage("§aSuccessfully registered!");
 								config.set(path, args[0]);
-								unverified.remove(p.getName());
-								return true;
+								unverified.remove(p);
 							} else {
 								p.sendMessage("§cPasswords does not match");
 								return true;
